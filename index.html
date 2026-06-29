@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATOMS Control Panel</title>
+</head>
+<body>
+
+<h1>ATOMS Control Panel</h1>
+
+<p>Pico IP:</p>
+<input id="ip" value="10.255.101.211">
+
+<br><br>
+
+<button onclick="send('/inject')">Inject</button>
+<button onclick="send('/rubber')">Rubber</button>
+
+<script>
+function send(path) {
+    let ip = document.getElementById("ip").value;
+    fetch("http://" + ip + path)
+        .then(r => r.text())
+        .then(console.log)
+        .catch(console.error);
+}
+</script>
+
+</body>
+</html>
