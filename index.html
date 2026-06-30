@@ -1,86 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ATOMS Control Panel</title>
+<title>ATOMS Control Panel</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #0f0f0f;
-            color: white;
-            margin: 0;
-        }
+<style>
+body {
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+    margin: 0;
+}
 
-        header {
-            background: #111;
-            padding: 15px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: bold;
-        }
+header {
+    background: #111;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+}
 
-        nav {
-            display: flex;
-            justify-content: space-around;
-            background: #222;
-            padding: 10px;
-        }
+nav {
+    display: flex;
+    justify-content: space-around;
+    background: #222;
+    padding: 10px;
+}
 
-        nav button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 14px;
-        }
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+}
 
-        .section {
-            padding: 20px;
-        }
+.section {
+    padding: 20px;
+}
 
-        .card {
-            background: #1c1c1c;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
+.card {
+    background: #1c1c1c;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
 
-        button.action {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            background: #444;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-        }
+button.action {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0;
+    background: #444;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 15px;
+}
 
-        button.action:hover {
-            background: #666;
-        }
+button:hover {
+    background: #666;
+}
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
-            border: none;
-        }
-    </style>
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 6px;
+    border: none;
+}
+</style>
 </head>
 
 <body>
 
-<header>
-⚡ ATOMS Control Panel
-</header>
+<header>⚡ ATOMS Control Panel</header>
 
 <nav>
     <button onclick="show('home')">Home</button>
+    <button onclick="show('payload')">Payload</button>
+    <button onclick="show('keyboard')">Keyboard</button>
     <button onclick="show('setup')">Setup</button>
-    <button onclick="show('hid')">HID</button>
 </nav>
 
+<!-- HOME -->
 <div id="home" class="section">
     <div class="card">
         <h3>Connection</h3>
@@ -95,43 +94,75 @@
     </div>
 </div>
 
-<div id="hid" class="section" style="display:none;">
+<!-- PAYLOAD -->
+<div id="payload" class="section" style="display:none;">
+    <div class="card">
+        <h3>Single Payload</h3>
+        <textarea id="singlePayload" placeholder="Type payload here..."></textarea>
+        <button class="action" onclick="sendSingle()">Send Single Payload</button>
+    </div>
+
+    <div class="card">
+        <h3>Modify Payload</h3>
+        <textarea id="multiPayload" placeholder="Edit payload..."></textarea>
+        <button class="action" onclick="savePayload()">Save Payload</button>
+    </div>
+</div>
+
+<!-- KEYBOARD -->
+<div id="keyboard" class="section" style="display:none;">
     <div class="card">
         <h3>Live Keyboard</h3>
-        <input id="keyboard" placeholder="Type here..."
+        <input id="keyboardInput" placeholder="Type live..."
             oninput="sendText(this.value)">
     </div>
 </div>
 
+<!-- SETUP -->
 <div id="setup" class="section" style="display:none;">
     <div class="card">
         <h3>Setup</h3>
-        <p>Change Pico IP and reconnect.</p>
+        <p>Change IP and reconnect.</p>
     </div>
 </div>
 
 <script>
 function show(section) {
     document.getElementById("home").style.display = "none";
-    document.getElementById("hid").style.display = "none";
+    document.getElementById("payload").style.display = "none";
+    document.getElementById("keyboard").style.display = "none";
     document.getElementById("setup").style.display = "none";
 
     document.getElementById(section).style.display = "block";
 }
 
 function send(path) {
-    const ip = document.getElementById("ip").value;
+    let ip = document.getElementById("ip").value;
 
     fetch("http://" + ip + path)
         .then(r => r.text())
-        .then(data => console.log(data))
-        .catch(err => console.error(err));
+        .then(console.log)
+        .catch(console.error);
 }
 
-function sendText(text) {
-    const ip = document.getElementById("ip").value;
+function sendText(val) {
+    let ip = document.getElementById("ip").value;
 
-    fetch("http://" + ip + "/type?data=" + encodeURIComponent(text));
+    fetch("http://" + ip + "/type?data=" + encodeURIComponent(val));
+}
+
+function sendSingle() {
+    let ip = document.getElementById("ip").value;
+    let data = document.getElementById("singlePayload").value;
+
+    fetch("http://" + ip + "/single?data=" + encodeURIComponent(data));
+}
+
+function savePayload() {
+    let ip = document.getElementById("ip").value;
+    let data = document.getElementById("multiPayload").value;
+
+    fetch("http://" + ip + "/save?data=" + encodeURIComponent(data));
 }
 </script>
 
